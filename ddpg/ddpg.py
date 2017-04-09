@@ -268,14 +268,14 @@ def train(sess, env, actor, critic):
     # Initialize replay memory
     replay_buffer = ReplayBuffer(BUFFER_SIZE, RANDOM_SEED)
 
-    for i in xrange(MAX_EPISODES):
+    for i in range(MAX_EPISODES):
 
         s = env.reset()
 
         ep_reward = 0
         ep_ave_max_q = 0
 
-        for j in xrange(MAX_EP_STEPS):
+        for j in range(MAX_EP_STEPS):
 
             if RENDER_ENV:
                 env.render()
@@ -299,7 +299,7 @@ def train(sess, env, actor, critic):
                     s2_batch, actor.predict_target(s2_batch))
 
                 y_i = []
-                for k in xrange(MINIBATCH_SIZE):
+                for k in range(MINIBATCH_SIZE):
                     if t_batch[k]:
                         y_i.append(r_batch[k])
                     else:

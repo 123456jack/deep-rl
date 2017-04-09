@@ -333,8 +333,8 @@ def train(sess, env, actor, critic):
                 writer.add_summary(summary_str, i)
                 writer.flush()
 
-                print '| Reward: %.2i' % int(ep_reward), " | Episode", i, \
-                    '| Qmax: %.4f' % (ep_ave_max_q / float(j))
+                print('Reward: ' + str(ep_reward) + ',   Episode: ' + str(i) + ',    Qmax: ' +  str(ep_ave_max_q / float(j)))
+                #print '| Reward: %.2i' % int(ep_reward), " | Episode", i, '| Qmax: %.4f' % (ep_ave_max_q / float(j))
 
                 break
 

@@ -95,8 +95,12 @@ class ActorNetwork(object):
         self.action_gradient = tf.placeholder(tf.float32, [None, self.a_dim])
 
         # Combine the gradients here
+        # grad_ys is a list of tensors of the same length as ys that holds the initial gradients for each y in ys. 
+        # When grad_ys is None, we fill in a tensor of '1's of the shape of y for each y in ys. 
+        # A user can provide their own initial grad_ys to compute the derivatives using a different 
+        # initial gradient for each y (e.g., if one wanted to weight the gradient differently for each value in each y).
         self.actor_gradients = tf.gradients(
-            self.scaled_out, self.network_params, -self.action_gradient)
+            self.scaled_out, self.network_params, grad_ys=-self.action_gradient)
 
         # Optimization Op
         self.optimize = tf.train.AdamOptimizer(self.learning_rate).\

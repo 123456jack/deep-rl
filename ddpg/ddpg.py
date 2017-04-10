@@ -92,22 +92,17 @@ class ActorNetwork(object):
                 for i in range(len(self.target_network_params))]
 
         # This gradient will be provided by the critic network
-        self.action_gradient = tf.placeholder(tf.float32, [None, self.a_dim])
+        self.critic_gradient = tf.placeholder(tf.float32, [None, self.a_dim])
 
-        # Combine the gradients here
-        # grad_ys is a list of tensors of the same length as ys that holds the initial gradients for each y in ys. 
-        # When grad_ys is None, we fill in a tensor of '1's of the shape of y for each y in ys. 
-        # A user can provide their own initial grad_ys to compute the derivatives using a different 
-        # initial gradient for each y (e.g., if one wanted to weight the gradient differently for each value in each y).
-        self.actor_gradients = tf.gradients(
-            self.scaled_out, self.network_params, grad_ys=-self.action_gradient)
-
-        # Optimization Op
+        # Combine the gradients
+        #self.policy_gradient = tf.gradients(self.scaled_out, self.network_params, grad_ys=-self.critic_gradient)
+        self.policy_gradient = tf.gradients(tf.multiply(self.scaled_out, -self.critic_gradient), self.network_params)
+        
+        # Optimization Op        
         self.optimize = tf.train.AdamOptimizer(self.learning_rate).\
-            apply_gradients(zip(self.actor_gradients, self.network_params))
+            apply_gradients(zip(self.policy_gradient, self.network_params))
 
-        self.num_trainable_vars = len(
-            self.network_params) + len(self.target_network_params)
+        self.num_trainable_vars = len(self.network_params) + len(self.target_network_params)
 
     def create_actor_network(self):
         inputs = tflearn.input_data(shape=[None, self.s_dim])
@@ -121,10 +116,10 @@ class ActorNetwork(object):
         scaled_out = tf.multiply(out, self.action_bound)
         return inputs, out, scaled_out
 
-    def train(self, inputs, a_gradient):
+    def train(self, inputs, c_gradient):
         self.sess.run(self.optimize, feed_dict={
             self.inputs: inputs,
-            self.action_gradient: a_gradient
+            self.critic_gradient: c_gradient
         })
 
     def predict(self, inputs):
